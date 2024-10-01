@@ -1,0 +1,36 @@
+//@version=5
+indicator("Combined Full Band EMA Crossover with Price Alerts", overlay=true)
+
+// Calculate the 20 EMA for high and low prices
+ema20_high = ta.ema(high, 20)
+ema20_low = ta.ema(low, 20)
+
+// Calculate the 200 EMA for high and low prices
+ema200_high = ta.ema(high, 200)
+ema200_low = ta.ema(low, 200)
+
+// Plot the 20 EMA high and low
+plot(ema20_high, color=color.green, title="20 EMA High")
+plot(ema20_low, color=color.red, title="20 EMA Low")
+
+// Plot the 200 EMA high and low
+plot(ema200_high, color=color.blue, title="200 EMA High")
+plot(ema200_low, color=color.orange, title="200 EMA Low")
+
+// Bullish crossover: 20 EMA low crossing above 200 EMA high
+bullishCrossover = ta.crossover(ema20_low, ema200_high)
+// Bearish crossover: 20 EMA high crossing below 200 EMA low
+bearishCrossover = ta.crossunder(ema20_high, ema200_low)
+
+// Alerts for price crossing above/below EMAs
+priceAbove200High = (close[1] <= ema200_high and close > ema200_high)
+priceBelow200Low = (close[1] >= ema200_low and close < ema200_low)
+priceAbove20High = (close[1] <= ema20_high and close > ema20_high)
+priceBelow20Low = (close[1] >= ema20_low and close < ema20_low)
+
+// Combined alert
+combinedAlert = bullishCrossover or bearishCrossover or priceAbove200High or priceBelow200Low or priceAbove20High or priceBelow20Low
+
+// Trigger the combined alert
+if (combinedAlert)
+    alert("Combined Alert Triggered: EMA Crossover or Price Level Crossed", alert.freq_once_per_bar_close)
